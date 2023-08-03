@@ -15,6 +15,46 @@ function sendEmail(receiver, subject, htmlBody, inlineImages) {
   })
 }
 
+function createGraphFromData(csvData) {
+  var data = Charts.newDataTable()
+
+  // Add columns using csvData[0]
+  for (var i = 0; i < csvData[0].length; i++) {
+    // check the next row to see if it is a number or not
+    var isNumber = !isNaN(csvData[1][i])
+
+    // add column with the correct type
+    if (isNumber) {
+      data.addColumn(Charts.ColumnType.NUMBER, csvData[0][i])
+    }
+    else {
+      data.addColumn(Charts.ColumnType.STRING, csvData[0][i])
+    }
+  }
+
+  // Add rows using csvData rows
+  for (var i = 1; i < csvData.length; i++) {
+    data.addRow(csvData[i])
+  }
+
+  // Create chart
+  var barChart = Charts.newBarChart()
+    .setDataTable(data)
+    .setDimensions(1000, 1000)
+    .build()
+
+  var areaChart = Charts.newAreaChart()
+    .setDataTable(data)
+    .setDimensions(1000, 1000)
+    .build()
+
+  // return charts as blobs for inline images
+  return {
+    barChart: barChart.getBlob(),
+    areaChart: areaChart.getBlob()
+  }
+}
+
 function importCSVFromLink() {
   const ui = SpreadsheetApp.getUi()
   const sheet = SpreadsheetApp.getActiveSheet()
@@ -45,6 +85,6 @@ function importCSVFromLink() {
 
   if (response == ui.Button.YES) {
     const email = ui.prompt("Enter your email").getResponseText()
-    sendEmail(email, "CSV Analytics - CSVease", "<h1>CSV Analytics Here!</h1>", {})
+    sendEmail(email, "CSV Analytics - CSVease", `<h2>Here are the analytics for your CSV File</h2><img src="cid:barChart"><img src="cid:areaChart">`, createGraphFromData(data))
   }
 }
