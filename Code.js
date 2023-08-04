@@ -64,6 +64,7 @@ function importCsvFromText(text) {
   // Parsing the CSV text
   const csv = text
   const data = Utilities.parseCsv(csv)
+  console.log(prevDataColumns)
 
   // Check if the structure of the CSV file matches the structure of the sheet
   if (prevDataColumns > 0 && prevDataColumns != data[0].length) {
@@ -73,6 +74,8 @@ function importCsvFromText(text) {
       ui.alert("Import cancelled!")
       return
     }
+  } else if (prevDataColumns > 0) {
+    data.shift()
   }
 
   // Populate sheet with data
