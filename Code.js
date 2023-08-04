@@ -86,6 +86,9 @@ function importCsvFromText(text) {
     const email = ui.prompt("Enter your email").getResponseText()
     sendEmail(email, "CSV Analytics - CSVease", `<h2>Here are the analytics for your CSV File</h2><img src="cid:barChart"><img src="cid:areaChart">`, createGraphFromData(data))
   }
+
+  const chart = HtmlService.createHtmlOutputFromFile("chart").setHeight(800).setWidth(800).getContent().replace("SHEET_URL_HERE", `"${getURL()}"`)
+  ui.showModalDialog(HtmlService.createHtmlOutput(chart), "CSV Analytics")
 }
 
 function importCSVFromFile() {
@@ -99,4 +102,8 @@ function importCSVFromLink() {
   const file = ui.prompt("Enter CSV file URL").getResponseText()
   const csv = UrlFetchApp.fetch(file).getContentText()
   importCsvFromText(csv)
+}
+
+function getURL() {
+  return SpreadsheetApp.getActiveSpreadsheet().getUrl()
 }
