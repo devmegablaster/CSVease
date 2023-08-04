@@ -15,6 +15,7 @@ fileInput.addEventListener('change', (e) => {
         const file = e.target.result;
         google.script.run.withSuccessHandler(onSuccess).importCsvFromText(file);
     };
+    reader.readAsText(file);
     onSuccess = (data) => {
         console.log(data);
     };
