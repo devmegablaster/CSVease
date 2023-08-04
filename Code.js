@@ -8,51 +8,11 @@ function onOpen() {
     .addToUi()
 }
 
-function sendEmail(receiver, subject, htmlBody, inlineImages) {
-  GmailApp.sendEmail(receiver, subject, "", {
-    htmlBody: htmlBody,
-    inlineImages: inlineImages
-  })
-}
+function sendEmail(receiver, subject, htmlBody) {
+  // Append chart to the html body
+  const chartFromHtml = HtmlService.createHtmlOutputFromFile("chart").getContent().replace("SHEET_URL_HERE", `"${getURL()}"`)
 
-function createGraphFromData(csvData) {
-  var data = Charts.newDataTable()
-
-  // Add columns using csvData[0]
-  for (var i = 0; i < csvData[0].length; i++) {
-    // check the next row to see if it is a number or not
-    var isNumber = !isNaN(csvData[1][i])
-
-    // add column with the correct type
-    if (isNumber) {
-      data.addColumn(Charts.ColumnType.NUMBER, csvData[0][i])
-    }
-    else {
-      data.addColumn(Charts.ColumnType.STRING, csvData[0][i])
-    }
-  }
-
-  // Add rows using csvData rows
-  for (var i = 1; i < csvData.length; i++) {
-    data.addRow(csvData[i])
-  }
-
-  // Create chart
-  var barChart = Charts.newBarChart()
-    .setDataTable(data)
-    .setDimensions(1000, 1000)
-    .build()
-
-  var areaChart = Charts.newAreaChart()
-    .setDataTable(data)
-    .setDimensions(1000, 1000)
-    .build()
-
-  // return charts as blobs for inline images
-  return {
-    barChart: barChart.getBlob(),
-    areaChart: areaChart.getBlob()
-  }
+  GmailApp.sendEmail(receiver, subject, chartFromHtml)
 }
 
 function importCsvFromText(text) {
@@ -84,8 +44,11 @@ function importCsvFromText(text) {
 
   if (response == ui.Button.YES) {
     const email = ui.prompt("Enter your email").getResponseText()
-    sendEmail(email, "CSV Analytics - CSVease", `<h2>Here are the analytics for your CSV File</h2><img src="cid:barChart"><img src="cid:areaChart">`, createGraphFromData(data))
+    sendEmail(email, "CSV Analytics - CSVease", `<h2>Here are the analytics for your CSV File</h2>`)
   }
+
+  const chart = HtmlService.createHtmlOutputFromFile("chart").getContent().replace("SHEET_URL_HERE", `"${getURL()}"`)
+  ui.showModalDialog(HtmlService.createHtmlOutput(chart), "CSV Analytics")
 }
 
 function importCSVFromFile() {
@@ -98,5 +61,11 @@ function importCSVFromLink() {
   const ui = SpreadsheetApp.getUi()
   const file = ui.prompt("Enter CSV file URL").getResponseText()
   const csv = UrlFetchApp.fetch(file).getContentText()
+
   importCsvFromText(csv)
+}
+
+function getURL() {
+  // return the spreadsheet URL
+  return SpreadsheetApp.getActiveSpreadsheet().getUrl()
 }
