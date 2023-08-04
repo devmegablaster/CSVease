@@ -1,0 +1,22 @@
+<script src="https://cdn.tailwindcss.com"></script>
+
+<div class="w-10/12 mx-auto">
+<label class="block mb-2 text-sm font-medium text-gray-900" for="file_input">Upload file</label>
+<input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" accept=".csv" aria-describedby="file_input_help" id="file_input" type="file">
+<p class="mt-1 text-sm text-gray-500" id="file_input_help">CSV Files Only</p>
+</div>
+
+<script>
+const fileInput = document.querySelector('input[type="file"]');
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const file = e.target.result;
+        google.script.run.withSuccessHandler(onSuccess).importCsvFromText(file);
+    };
+    onSuccess = (data) => {
+        console.log(data);
+    };
+});
+</script>
