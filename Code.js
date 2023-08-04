@@ -87,13 +87,13 @@ function importCsvFromText(text) {
     sendEmail(email, "CSV Analytics - CSVease", `<h2>Here are the analytics for your CSV File</h2><img src="cid:barChart"><img src="cid:areaChart">`, createGraphFromData(data))
   }
 
-  const chart = HtmlService.createHtmlOutputFromFile("chart").setHeight(800).setWidth(800).getContent().replace("SHEET_URL_HERE", `"${getURL()}"`)
-  ui.showModalDialog(HtmlService.createHtmlOutput(chart), "CSV Analytics")
+  const chart = HtmlService.createHtmlOutputFromFile("chart").getContent().replace("SHEET_URL_HERE", `"${getURL()}"`)
+  ui.showModalDialog(HtmlService.createHtmlOutput(chart).setHeight(1000).setWidth(1000), "CSV Analytics")
 }
 
 function importCSVFromFile() {
   const html = HtmlService.createHtmlOutputFromFile("index")
-  SpreadsheetApp.getUi().showModalDialog(html, "Import CSV from File")
+  SpreadsheetApp.getUi().showModalDialog(html.setHeight(100), "Import CSV from File")
 }
 
 function importCSVFromLink() {
@@ -107,3 +107,4 @@ function importCSVFromLink() {
 function getURL() {
   return SpreadsheetApp.getActiveSpreadsheet().getUrl()
 }
+
